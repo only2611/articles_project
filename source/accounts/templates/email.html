@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title></title>
+    <style>
+        .table-body {
+            background: #f4f4f4;
+            text-align: center;
+            padding: 30px;
+            max-width: 1000px;
+        }
+
+        .table-content {
+            background: #FFFFFF;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .table-content-heading {
+            font-size: 30px;
+            color: #b5b5b5;
+            margin-bottom: 5px;
+        }
+
+        .table-content-description {
+            color: #b5b5b5;
+            margin-bottom: 20px;
+        }
+
+        .table-content-link {
+            background: #50bcd9;
+            color: #ffffff;
+            font-size: 18px;
+            padding: 10px 20px;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .table-footer {
+            color: #b5b5b5;
+        }
+    </style>
+</head>
+<body>
+<table class="table-body">
+    <tr>
+        <td>
+            <table class="table-content">
+                <tr>
+                    <td>
+                        <h3 class="table-content-heading">Подтверждение Email</h3>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p class="table-content-description">
+                            Для подтверждения нажмите на кнопку ниже
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="{{ url }}"
+                           class="table-content-link">
+                            Подтвердить Email
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td class="table-footer">
+            Если вы не регистрировались на нашем сайте проигнорируйте это письмо
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

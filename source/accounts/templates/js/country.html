@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="container">
+
+</div>
+
+
+<script>
+    async function makeRequest(url, method = 'GET') {
+        let response = await fetch(url, {method});
+        if (response.ok) {  // нормальный ответ
+            return await response.json();
+        } else {            // ошибка
+            let error = new Error(response.statusText);
+            error.response = response;
+            throw error;
+        }
+    }
+
+    function onBorderLoad({name}) {
+
+    console.log(name.official);
+
+}
+
+
+function onBordersLoad(borders) {
+
+    let promises = borders.map(code => {
+        let url = `https://restcountries.com/v3.1/alpha/${code}?fields=name`;
+        return makeRequest(url);
+    });
+    return Promise.all(promises);
+}
+
+    async function onCountryLoad() {
+        let urlParams = new URLSearchParams(window.location.search);
+        let name = urlParams.get('name');
+        let country = await makeRequest(`https://restcountries.com/v3.1/name/${name}?fields=name,capital,currencies,borders`);
+
+        country = country[0]
+
+        console.log(country)
+        let container = document.getElementById("container")
+        let h = document.createElement("h1")
+        h.innerText = country.name.official
+        container.appendChild(h)
+
+
+        let h3 = document.createElement("h3")
+        h3.innerText = country.capital.join()
+        container.appendChild(h3)
+
+        let p = document.createElement("p")
+        p.innerText = ""
+
+        for (let currency in country.currencies){
+                p.innerText += `${country.currencies[currency].name} | `
+        }
+        container.appendChild(p)
+
+        let borders = await onBordersLoad(country.borders)
+        console.log(borders)
+
+        let p1 = document.createElement("p")
+        let borders_names = borders.map((border)=>{
+            return border.name.official
+        })
+        console.log(borders_names)
+        p1.innerText = borders_names.join()
+
+        container.appendChild(p1)
+    }
+
+    window.addEventListener("load", onCountryLoad);
+
+</script>
+</body>
+</html>

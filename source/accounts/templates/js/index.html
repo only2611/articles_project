@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Tewst</h1>
+<div id="container">
+
+</div>
+<script>
+    async function makeRequest(url, method='GET') {
+        let response = await fetch(url, {method});
+        if (response.ok) {  // нормальный ответ
+            return await response.json();
+        } else {            // ошибка
+            let error = new Error(response.statusText);
+            error.response = response;
+            throw error;
+        }
+    }
+
+        async function onCountriesLoad(){
+            console.log("tttt");
+            let response = await makeRequest("https://restcountries.com/v3.1/all?fields=name");
+            console.log(response)
+            let container = document.getElementById("container")
+            for (let country of response){
+                let a = document.createElement("a");
+                a.innerText = country["name"]["official"];
+                a.href = `./country.html?name=${country["name"]["official"]}`
+                container.appendChild(a);
+            }
+        }
+
+        window.addEventListener("load", onCountriesLoad);
+
+
+</script>
+</body>
+</html>

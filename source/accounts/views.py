@@ -1,13 +1,17 @@
 from django.contrib.auth import authenticate, login, logout, get_user_model, update_session_auth_hash
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.views import PasswordChangeView
+from django.core.exceptions import BadRequest
+from django.core.mail import send_mail
 from django.core.paginator import Paginator
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
 from django.urls import reverse
+from django.views import View
 from django.views.generic import CreateView, DetailView, UpdateView
 
 from accounts.forms import MyUserCreationForm, UserChangeForm, ProfileChangeForm, PasswordChangeForm
-from accounts.models import Profile
+from accounts.models import Profile, Token
 
 User = get_user_model()
 
@@ -18,9 +22,21 @@ class RegisterView(CreateView):
     form_class = MyUserCreationForm
 
     def form_valid(self, form):
-        user = form.save()
+        user = form.save(commit=False)
+        user.is_active = False
+        user.save()
         Profile.objects.create(user=user)
-        login(self.request, user)
+        token = Token.objects.create(user=user)
+        url = f"http://localhost:8000{reverse('accounts:email_confirm', kwargs={'token': token.token})}"
+        html_message = render_to_string("email.html", {"url": url})
+
+        send_mail(
+            subject="Подтверждение адреса электронной почты",
+            message="",
+            from_email="from@example.com",
+            recipient_list=[user.email],
+            html_message=html_message
+        )
         return redirect(self.get_success_url())
 
     def get_success_url(self):
@@ -30,6 +46,20 @@ class RegisterView(CreateView):
         if not next_url:
             next_url = reverse('webapp:index')
         return next_url
+
+
+class EmailConfirmView(View):
+    def get(self, request, *args, **kwargs):
+        token_str = kwargs.get("token")
+        token = get_object_or_404(Token, token=token_str)
+        if token.is_expired():
+            raise BadRequest()
+        user = token.user
+        user.is_active = True
+        user.save()
+        login(self.request, user)
+        token.delete()
+        return redirect("webapp:index")
 
 
 def login_view(request):

@@ -1,13 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.contrib.auth.models import Permission
 from django.db.models import Q
-from django.shortcuts import redirect, get_object_or_404
+from django.http import JsonResponse
 from django.urls import reverse_lazy
 
 # Create your views here.
 from django.utils.http import urlencode
 
-from webapp.forms import ArticleForm, SearchForm, ArticleDeleteForm, UserArticleForm
+from webapp.forms import ArticleForm, SearchForm, ArticleDeleteForm
 from webapp.models import Article
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
@@ -25,6 +24,7 @@ class IndexView(ListView):
         # print(request.user.user_permissions.all())
         self.form = self.get_search_form()
         self.search_value = self.get_search_value()
+        # return JsonResponse({"test": 1, "test2": [1, 2, 3]})
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):

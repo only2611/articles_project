@@ -35,9 +35,6 @@ class Article(BaseModel):
         db_table = "articles"
         verbose_name = "Статья"
         verbose_name_plural = "Статьи"
-        # permissions = [
-        #     ('сan_have_piece_of_pizza', 'Может съесть кусочек пиццы')
-        # ]
 
 
 class Comment(BaseModel):
@@ -64,3 +61,4 @@ class Tag(BaseModel):
         db_table = "tags"
         verbose_name = "Тэг"
         verbose_name_plural = "Тэги"
+

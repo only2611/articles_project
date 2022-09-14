@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.utils.http import urlencode
 
 from webapp.forms import ArticleForm, SearchForm, ArticleDeleteForm
-from webapp.models import Article
+from webapp.models import Article, Tag
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 
@@ -19,9 +19,6 @@ class IndexView(ListView):
     paginate_by = 6
 
     def get(self, request, *args, **kwargs):
-        # print(request.user.user_permissions.all())
-        # request.user.user_permissions.add(Permission.objects.get(codename="delete_article"))
-        # print(request.user.user_permissions.all())
         self.form = self.get_search_form()
         self.search_value = self.get_search_value()
         # return JsonResponse({"test": 1, "test2": [1, 2, 3]})
@@ -30,13 +27,14 @@ class IndexView(ListView):
     def get_queryset(self):
         if self.search_value:
             return Article.objects.filter(
-                Q(author__icontains=self.search_value) |
-                Q(title__icontains=self.search_value)).order_by("-updated_at")
+                Q(author__username__contains=self.search_value) |
+                Q(title__contains=self.search_value)).order_by("-updated_at")
         return Article.objects.all().order_by("-updated_at")
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(object_list=object_list, **kwargs)
         context["form"] = self.form
+        context['tags'] = Tag.objects.all()
         if self.search_value:
             query = urlencode({'search': self.search_value})  # search=dcsdvsdvsd
             context['query'] = query

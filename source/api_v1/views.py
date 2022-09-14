@@ -1,11 +1,12 @@
 from decimal import Decimal
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, JsonResponse, HttpResponseNotAllowed
 from django.shortcuts import render
 from datetime import datetime
 import json
 
-
+from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from webapp.models import Article
@@ -16,6 +17,7 @@ def get_token_view(request, *args, **kwargs):
     if request.method == 'GET':
         return HttpResponse()
     return HttpResponseNotAllowed(['GET'])
+
 
 # Create your views here.
 def echo_view(request):
@@ -36,14 +38,13 @@ def echo_view(request):
 
 
 def articles_view(request):
+    print(request)
     if request.method == "GET":
-        articles = Article.objects.values("title", "content")
-        # articles_data = []
-        # for article in articles:
-        #     articles_data.append({
-        #         "title": article.title,
-        #         "content": article.content
-        #     })
+        tag_id = request.GET.get("tag_id")
+        if tag_id:
+            articles = Article.objects.filter(tags__id=tag_id).values("title", "content")
+        else:
+            articles = Article.objects.values("title", "content")
         return JsonResponse(list(articles), safe=False)
     elif request.method == "POST":
         if request.body:
@@ -55,3 +56,15 @@ def articles_view(request):
         return JsonResponse({"message": "error"}, status=400)
     else:
         return HttpResponseNotAllowed(['GET', 'POST'])
+
+
+class LikesView(LoginRequiredMixin, View):
+    def get(self, request, *args, pk, **kwargs):
+        article = Article.objects.get(pk=pk)
+        user = self.request.user
+        if user in article.likes.all():
+            article.likes.remove(user)
+        else:
+            article.likes.add(user)
+
+        return JsonResponse({"count": article.likes.count()})

@@ -38,6 +38,12 @@ def echo_view(request):
 
 
 def articles_view(request):
+
+
+
+
+
+
     print(request)
     if request.method == "GET":
         tag_id = request.GET.get("tag_id")

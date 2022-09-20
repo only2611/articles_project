@@ -15,17 +15,6 @@ from webapp.models import Article
 # Create your views here.
 
 
-# def form_valid(self, form):
-#     article = get_object_or_404(Article, pk=self.kwargs.get("pk"))
-#     user = self.request.user
-#     form.instance.article = article
-#     form.instance.author = user
-#     return super().form_valid(form)
-#
-# def get_success_url(self):
-#     return reverse("webapp:article_view", kwargs={"pk": self.object.article.pk})
-
-
 class ArticleView(APIView):
     serializer_class = ArticleModelsSerializer
 
@@ -52,8 +41,8 @@ class ArticleView(APIView):
         serializer.save()
         return Response(serializer.data)
 
-
     def delete(self, request, *args, pk, **kwargs):
         article = get_object_or_404(Article, pk=pk)
+        kwargs["pk"] = article.pk
         article.delete()
-        return Response(article.pk)
+        return Response(kwargs["pk"])

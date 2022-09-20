@@ -15,13 +15,29 @@ from webapp.models import Article
 # Create your views here.
 
 
+# def form_valid(self, form):
+#     article = get_object_or_404(Article, pk=self.kwargs.get("pk"))
+#     user = self.request.user
+#     form.instance.article = article
+#     form.instance.author = user
+#     return super().form_valid(form)
+#
+# def get_success_url(self):
+#     return reverse("webapp:article_view", kwargs={"pk": self.object.article.pk})
+
+
 class ArticleView(APIView):
     serializer_class = ArticleModelsSerializer
 
     def get(self, request, *args, **kwargs):
-        articles = Article.objects.all()
-        articles_data = self.serializer_class(articles, many=True).data
-        return Response(articles_data)
+        if kwargs:
+            article = get_object_or_404(Article, pk=self.kwargs.get("pk"))
+            article_data = self.serializer_class(article,).data
+            return Response(article_data)
+        else:
+            articles = Article.objects.all()
+            articles_data = self.serializer_class(articles, many=True).data
+            return Response(articles_data)
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
@@ -35,3 +51,10 @@ class ArticleView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+
+
+    def delete(self, request, *args, pk, **kwargs):
+        article = get_object_or_404(Article, pk=pk)
+        article.delete()
+        return Response(article.pk)

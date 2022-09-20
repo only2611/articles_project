@@ -29,6 +29,7 @@ class ArticleSerializer(serializers.Serializer):
         return instance
 
 
+
 class ArticleModelsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article

@@ -10,7 +10,7 @@ urls_articles = [
 
 urlpatterns = [
     path("echo/", echo_view),
-    path("get-token/", get_token_view),
+    path("get-token", get_token_view),
     path("articles/", include(urls_articles)),
     path("likes/<int:pk>/", LikesView.as_view(), name="likes")
 ]

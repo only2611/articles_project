@@ -45,7 +45,7 @@ async function sendLike(event){
     let articleId = target.dataset.articleId;
     let span = document.getElementById(articleId);
     span.innerText = `Лайки: ${count}`;
-    if(target.innerText === "Дизлайк"){K
+    if(target.innerText === "Дизлайк"){
         target.innerText = "Лайк";
     }
     else{

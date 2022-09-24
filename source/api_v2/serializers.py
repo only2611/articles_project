@@ -1,6 +1,7 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from webapp.models import Article
+from webapp.models import Article, Comment, Tag
 
 
 class ArticleSerializer(serializers.Serializer):
@@ -30,7 +31,33 @@ class ArticleSerializer(serializers.Serializer):
 
 
 
+class AuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ("username", "email", "id")
+        # fields = "__all__"
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ("name", "id")
+
+
 class ArticleModelsSerializer(serializers.ModelSerializer):
+    author = AuthorSerializer(read_only=True)
+    comments = serializers.PrimaryKeyRelatedField(queryset=Comment.objects.all(), many=True)
+    # tags = TagSerializer(many=True, read_only=True)
+    tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True, write_only=True)
+
+
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["tags"] = TagSerializer(instance.tags.all(), many=True).data
+        return data
+
+
+
     class Meta:
         model = Article
         fields = "__all__"
